@@ -27,23 +27,10 @@ func main() {
 
 	api := router.Group("/api/v1") //bila bikin routing menggunakan api ini maka akan di awali dengan api/v1
 	api.POST("/users", userHandler.RegisterUser)
+	api.POST("/sessions", userHandler.Login)
 
 	router.Run()
 
-	// fmt.Println("Connection to database succed !!")
-
-	// var users []user.User
-	// db.Find(&users)
-
-	// for _, user := range users {
-	// 	fmt.Println(user.Name)
-	// 	fmt.Println(user.Email)
-	// 	fmt.Println("==========")
-	// }
-
-	// router := gin.Default()
-	// router.GET("/handler", handler)
-	// router.Run()
 }
 
 // func handler(c *gin.Context) {
