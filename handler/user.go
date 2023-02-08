@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"kakastartup/auth"
 	"kakastartup/helper"
 	"kakastartup/user"
 	"net/http"
@@ -11,10 +12,11 @@ import (
 
 type userHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
@@ -42,7 +44,14 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	formatter := user.Formatter(newUser, "tokentokentokentoken")
+	token, err := h.authService.GenerateToken(newUser.ID)
+	if err != nil {
+		response := helper.APIResponse("Register account failed", http.StatusBadGateway, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := user.Formatter(newUser, token)
 
 	response := helper.APIResponse("Account has been registered", http.StatusOK, "success", formatter)
 
@@ -79,12 +88,19 @@ func (h *userHandler) Login(c *gin.Context) {
 
 	}
 
+	token, err := h.authService.GenerateToken(LoggedInUser.ID)
+	if err != nil {
+		response := helper.APIResponse("Login failed", http.StatusBadGateway, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
 	//mengembalikan dalam format json
-	formatter := user.Formatter(LoggedInUser, "tokentokentokentoken")
+	formatter := user.Formatter(LoggedInUser, token)
 	response := helper.APIResponse("Successfuly loggedin", http.StatusOK, "success", formatter)
 
 	c.JSON(http.StatusOK, response)
 }
+
 func (h *userHandler) EmailCheckAbility(c *gin.Context) {
 	var input user.CheckEmailInput
 

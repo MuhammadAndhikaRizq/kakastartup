@@ -1,8 +1,10 @@
 package main
 
 import (
+	"kakastartup/auth"
 	"kakastartup/handler"
 	"kakastartup/user"
+
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -20,8 +22,9 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.Newservice(userRepository)
+	authService := auth.NewService()
 
-	userHandler := handler.NewUserHandler(userService)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
 
