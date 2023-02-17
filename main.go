@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"kakastartup/auth"
+	"kakastartup/campaign"
 	"kakastartup/handler"
 	"kakastartup/helper"
 	"kakastartup/user"
@@ -25,6 +27,22 @@ func main() {
 	}
 
 	userRepository := user.NewRepository(db)
+	campaignRepository := campaign.NewRepository(db)
+
+	campaigns, err := campaignRepository.FindByUserID(1)
+
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println(len(campaigns))
+	for _, campaign := range campaigns {
+		fmt.Println(campaign.Name)
+		if len(campaign.CampaignImages) > 0 {
+			fmt.Println(campaign.CampaignImages[0].FileName)
+		}
+
+	}
+
 	userService := user.Newservice(userRepository)
 	authService := auth.NewService()
 
