@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"kakastartup/auth"
 	"kakastartup/campaign"
 	"kakastartup/handler"
@@ -33,10 +32,8 @@ func main() {
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
 
-	campaign, _ := campaignService.FindCampaigns(0)
-	fmt.Println(len(campaign))
-
 	userHandler := handler.NewUserHandler(userService, authService)
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	router := gin.Default()
 
@@ -47,6 +44,9 @@ func main() {
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 	//bila pemanggilan func tanpa () berarti pemanggilan func teresbut bukan hasil returnnya, contoh authMiddleware
 
+	//Post mengiritm data dari server/database
+	//Get mengambil data dari server
+	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	router.Run()
 
 }
