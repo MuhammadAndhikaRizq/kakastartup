@@ -36,6 +36,7 @@ func main() {
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	router := gin.Default()
+	router.Static("/images", "./images") //parameter kedua merupakan nama folder, parameter ke 1 nama routing
 
 	api := router.Group("/api/v1") //bila bikin routing menggunakan api ini maka akan di awali dengan api/v1
 	api.POST("/users", userHandler.RegisterUser)
