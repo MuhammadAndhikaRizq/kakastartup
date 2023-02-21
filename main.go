@@ -48,6 +48,7 @@ func main() {
 	//Post mengiritm data dari server/database
 	//Get mengambil data dari server
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
+	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
 	router.Run()
 
 }
