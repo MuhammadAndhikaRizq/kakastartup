@@ -3,6 +3,7 @@ package handler
 import (
 	"kakastartup/campaign"
 	"kakastartup/helper"
+	"kakastartup/user"
 	"net/http"
 	"strconv"
 
@@ -54,4 +55,32 @@ func (h *campaignHandller) GetCampaign(c *gin.Context) {
 	response := helper.APIResponse("Campaign Detail", http.StatusOK, "success", campaign.FormatCampaignDetail(campaignDetail))
 	c.JSON(http.StatusOK, response)
 
+}
+
+// mapping ke struct CreateCampaignInput
+func (h *campaignHandller) CreatCampaign(c *gin.Context) {
+	var input campaign.CreateCampaignInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationsError(err)
+
+		errorMessage := gin.H{"errors": errors}
+		response := helper.APIResponse("Failed to create campaign", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("CurrentUser").(user.User)
+
+	input.User = currentUser
+
+	newCampaign, err := h.service.CreatCampaign(input)
+	if err != nil {
+		response := helper.APIResponse("Failed to create campaign", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := helper.APIResponse("Succes to create campaign", http.StatusOK, "succes", campaign.FormatCampaign(newCampaign))
+	c.JSON(http.StatusOK, response)
 }
