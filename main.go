@@ -47,10 +47,12 @@ func main() {
 
 	//Post mengiritm data dari server/database
 	//Get mengambil data dari server
+	//Put mengirim data ke server (tetapi lebih digunakan untuk mengupdate dat)
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
 	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreatCampaign)
 	api.PUT("/campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
+	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadImage)
 	router.Run()
 
 }

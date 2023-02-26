@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"kakastartup/campaign"
 	"kakastartup/helper"
 	"kakastartup/user"
@@ -123,4 +124,52 @@ func (h *campaignHandller) UpdateCampaign(c *gin.Context) {
 	response := helper.APIResponse("Succes to update campaign", http.StatusOK, "succes", campaign.FormatCampaign(updateCampaign))
 	c.JSON(http.StatusOK, response)
 
+}
+
+func (h *campaignHandller) UploadImage(c *gin.Context) {
+	var input campaign.CreatCampaignImageInput
+
+	err := c.ShouldBind(&input)
+	if err != nil {
+		errors := helper.FormatValidationsError(err)
+
+		errorMessage := gin.H{"errors": errors}
+		response := helper.APIResponse("Failed to upload image campaign", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("CurrentUser").(user.User)
+	input.User = currentUser
+	userID := currentUser.ID
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		data := gin.H{"is_uploded": false}
+		response := helper.APIResponse("Failed to upload campaign image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+
+	c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{"is_uploded": false}
+		response := helper.APIResponse("Failed to upload campaign image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	_, err = h.service.SaveCampaignImage(input, path)
+	if err != nil {
+		data := gin.H{"is_uploded": false}
+		response := helper.APIResponse("Failed to upload campaign image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{"is_uploded": true}
+	response := helper.APIResponse("Campaign image successfuly upload", http.StatusOK, "success", data)
+	c.JSON(http.StatusBadRequest, response)
 }
