@@ -171,5 +171,5 @@ func (h *campaignHandller) UploadImage(c *gin.Context) {
 
 	data := gin.H{"is_uploded": true}
 	response := helper.APIResponse("Campaign image successfuly upload", http.StatusOK, "success", data)
-	c.JSON(http.StatusBadRequest, response)
+	c.JSON(http.StatusOK, response)
 }
