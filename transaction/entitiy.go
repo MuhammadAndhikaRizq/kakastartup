@@ -1,8 +1,11 @@
 package transaction
 
-import "time"
+import (
+	"kakastartup/user"
+	"time"
+)
 
-//Reperesentasi dari tabel transaction di database
+// Reperesentasi dari tabel transaction di database
 type Transaction struct {
 	ID         int
 	CampaignID int
@@ -10,6 +13,7 @@ type Transaction struct {
 	Amount     int
 	Status     string
 	Code       string
+	User       user.User
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
