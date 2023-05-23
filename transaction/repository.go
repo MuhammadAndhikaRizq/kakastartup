@@ -12,6 +12,7 @@ type Repository interface {
 	GetByCampaignID(campaignID int) ([]Transaction, error)
 	//kontrak mencari user transaction
 	GetByUserID(userUD int) ([]Transaction, error)
+	Save(transaction Transaction) (Transaction, error)
 }
 
 func NewRepository(db *gorm.DB) *repository {
@@ -32,10 +33,20 @@ func (r *repository) GetByCampaignID(campaignID int) ([]Transaction, error) {
 
 func (r *repository) GetByUserID(userID int) ([]Transaction, error) {
 	//representasi variabel agar gorm tau mencari data di tabel transaction
-	var transaction []Transaction
+	var transactions []Transaction
 
 	//memanggil relasi dengan campaign images melalui field campaign karean tabel transaction tidak memiliki koneksi langsung dengan campaign images
-	err := r.db.Preload("Campaign.CampaignImages", "campaign_images.is_primary = 1").Where("user_id = ?", userID).Order("id desc").Find(&transaction).Error
+	err := r.db.Preload("Campaign.CampaignImages", "campaign_images.is_primary = 1").Where("user_id = ?", userID).Order("id desc").Find(&transactions).Error
+	if err != nil {
+		return transactions, err
+	}
+	return transactions, nil
+
+}
+
+func (r *repository) Save(transaction Transaction) (Transaction, error) {
+	err := r.db.Create(&transaction).Error
+
 	if err != nil {
 		return transaction, err
 	}
