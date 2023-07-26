@@ -13,6 +13,7 @@ type Repository interface {
 	//kontrak mencari user transaction
 	GetByUserID(userUD int) ([]Transaction, error)
 	Save(transaction Transaction) (Transaction, error)
+	Update(transaction Transaction) (Transaction, error)
 }
 
 func NewRepository(db *gorm.DB) *repository {
@@ -52,4 +53,14 @@ func (r *repository) Save(transaction Transaction) (Transaction, error) {
 	}
 	return transaction, nil
 
+}
+
+func (r *repository) Update(transaction Transaction) (Transaction, error) {
+	err := r.db.Save(&transaction).Error
+
+	if err != nil {
+		return transaction, err
+	}
+
+	return transaction, nil
 }

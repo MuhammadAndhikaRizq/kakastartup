@@ -5,6 +5,7 @@ import (
 	"kakastartup/campaign"
 	"kakastartup/handler"
 	"kakastartup/helper"
+	"kakastartup/payment"
 	"kakastartup/transaction"
 	"kakastartup/user"
 	"net/http"
@@ -34,16 +35,8 @@ func main() {
 	userService := user.Newservice(userRepository)
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
-	transactionService := transaction.NewService(transactionRepository, campaignRepository)
-
-	user, _ := userService.GetUserById(7)
-
-	input := transaction.CreateTransactionInput{
-		CampaignID: 7,
-		Amount:     9000000,
-		User:       user,
-	}
-	transactionService.CreateTransaction(input)
+	paymentService := payment.NewService()
+	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
@@ -69,6 +62,8 @@ func main() {
 	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadImage)
 	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransaction)
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransactions)
+	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
+
 	router.Run()
 
 }
